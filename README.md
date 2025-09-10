@@ -1,11 +1,11 @@
 <div align="left" >
 <center>
-      <a href="./src/assets/images/logo/digifab.png" align="center">
-        <img src="./src/assets/images/logo/digifab.png" alt="Logo" width="150" height="150">
+      <a href="./docs/assets/images/logo/digifab.png" align="center">
+        <img src="./docs/assets/images/logo/digifab.png" alt="Logo" width="150" height="150">
       </a>    
 </center>
 <center>
-       <h1 style="display: inline-block; margin-left: 10px;">DigiFab - FrontEnd</h1>
+       <h1 style="display: inline-block; margin-left: 10px;">DigiFab - BackEnd</h1>
 </center>
 </div>
 
@@ -17,7 +17,7 @@
 
 # Projeto e desenvolvimento de web-app-api
 <p align="left">
-  <img src="./src/assets/images/logo/unisinos.png" width="100"/>
+  <img src="./docs/assets/images/logo/unisinos.png" width="100"/>
 </p>
 
 <!-- ABOUT THE PROJECT -->

@@ -28,6 +28,13 @@
 <!-- GETTING STARTED -->
 
 ## Getting Started
+   **Create .env**
+   ```sh
+   DB_HOST=$DB_HOST
+   DB_MYSQL=$DB_MYSQL
+   DB_USER_MYSQL=$DB_USER_MYSQL
+   DB_PASSWORD_MYSQL=$DB_PASSWORD_MYSQL
+   ```
 
 ### Prerequisites
 
@@ -44,10 +51,12 @@ Follow these steps to get your project up and running:
    ```sh
    git clone https://github.com/rosival-souza/digifab-backend
    ```
+
 2. **Navigate to the project directory**
    ```sh
    cd digifab-backend
    ```
+   
 3. **Install dependencies**
    ```sh
    npm install -D typescript

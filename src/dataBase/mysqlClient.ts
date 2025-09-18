@@ -30,13 +30,17 @@ interface BuyOrder {
   returnJSON?: any;
   status: string;
 }
-
+/** digifab**/
 async function createConnection() {
   return await mysql.createConnection({
-    host: process.env.DB_HOST,
-    database: process.env.DB_MYSQL,
+    host: process.env.DB_HOST_MYSQL,
+    database: process.env.DB_DATABASE_MYSQL,
     user: process.env.DB_USER_MYSQL,
     password: process.env.DB_PASSWORD_MYSQL,
+    port: 3306,
+    ssl: {
+      rejectUnauthorized: true,
+    }
   });
 }
 async function createConnectionWithRetry(): Promise<mysql.Connection> {
@@ -45,25 +49,51 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
 
     try {
       const connection = await mysql.createConnection({
-        host: process.env.DB_HOST,
-        database: process.env.DB_MYSQL,
+        host: process.env.DB_HOST_MYSQL,
+        database: process.env.DB_DATABASE_MYSQL,
         user: process.env.DB_USER_MYSQL,
         password: process.env.DB_PASSWORD_MYSQL,
+        port: 3306,
+        ssl: {
+          rejectUnauthorized: true,
+        }
       });
 
-      console.log('✅ Connected to MariaDB');
+      console.log('✅ Connected to MySQL');
       return connection;
 
     } catch (error) {
-      
+
       console.error('❌ Failed to connect to MySQL. Retrying in 20 seconds...', error);
 
       await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
 
     }
   }
-  
+
 }
+export async function getSupplier() {
+
+  const connection = await createConnection();
+
+  let rows: [] = [];
+
+  try {
+    const [result] = await connection.execute(
+      `
+        SELECT * FROM DIGIFAB.FORNECEDOR
+      `);
+    rows = result as [];
+
+  } catch (error) {
+    console.error('❌ Failed to fetch DIGIFAB.FORNECEDOR:', error);
+  } finally {
+    await connection.end();
+  }
+
+  return rows;
+}
+/** digifab**/
 export async function insertBuyOrder(data: BuyOrder) {
 
   const connection = await createConnection();
@@ -165,31 +195,6 @@ export async function insertSellOrder(data: SellOrder) {
   } finally {
     await connection.end();
   }
-}
-export async function getLastPurchase() {
-
-  const connection = await createConnection();
-
-  let rows: [] = [];
-
-  try {
-    const [result] = await connection.execute(
-      `
-      SELECT *
-        FROM CRYPTO_PURCHASES
-        WHERE STATUS = 'WAITING'
-        ORDER BY ID DESC
-        LIMIT 1
-      `);
-    rows = result as [];
-
-  } catch (error) {
-    console.error('❌ Failed to fetch CRYPTO_PURCHASES:', error);
-  } finally {
-    await connection.end();
-  }
-
-  return rows;
 }
 export async function updatePurchaseStatus(id: number, status: string) {
 

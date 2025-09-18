@@ -1,4 +1,3 @@
-// src/services/productService.ts
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { TickerPrice } from '../types/product';

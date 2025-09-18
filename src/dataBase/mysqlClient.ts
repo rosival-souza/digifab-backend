@@ -39,7 +39,7 @@ async function createConnection() {
     password: process.env.DB_PASSWORD_MYSQL,
     port: 3306,
     ssl: {
-      rejectUnauthorized: true,
+      rejectUnauthorized: false,
     }
   });
 }
@@ -55,7 +55,7 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
         password: process.env.DB_PASSWORD_MYSQL,
         port: 3306,
         ssl: {
-          rejectUnauthorized: true,
+          rejectUnauthorized: false,
         }
       });
 

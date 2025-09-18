@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import supplier from './routes/supplier.routes';
+import products from './routes/product.routes';
 
 dotenv.config();
 
@@ -9,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use('/api', supplier);
+// example use
+app.use('/api', products);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

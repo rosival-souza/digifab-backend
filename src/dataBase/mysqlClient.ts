@@ -38,9 +38,9 @@ async function createConnection() {
     user: process.env.DB_USER_MYSQL,
     password: process.env.DB_PASSWORD_MYSQL,
     port: 3306,
-    ssl: {
-      rejectUnauthorized: false,
-    }
+    // ssl: {
+    //   rejectUnauthorized: false,
+    // }
   });
 }
 async function createConnectionWithRetry(): Promise<mysql.Connection> {
@@ -53,10 +53,10 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
         database: process.env.DB_DATABASE_MYSQL,
         user: process.env.DB_USER_MYSQL,
         password: process.env.DB_PASSWORD_MYSQL,
-        port: 3306,
-        ssl: {
-          rejectUnauthorized: false,
-        }
+        // port: 3306,
+        // ssl: {
+        //   rejectUnauthorized: false,
+        // }
       });
 
       console.log('✅ Connected to MySQL');
@@ -73,7 +73,7 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
 
 }
 export async function getSupplier() {
-
+  console.log('connecting...', process.env)
   const connection = await createConnection();
 
   let rows: [] = [];
@@ -81,12 +81,12 @@ export async function getSupplier() {
   try {
     const [result] = await connection.execute(
       `
-        SELECT * FROM DIGIFAB.FORNECEDOR
+        SELECT * FROM fornecedor
       `);
     rows = result as [];
 
   } catch (error) {
-    console.error('❌ Failed to fetch DIGIFAB.FORNECEDOR:', error);
+    console.error('❌ Failed to fetch fornecedor:', error);
   } finally {
     await connection.end();
   }

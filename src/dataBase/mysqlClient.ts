@@ -32,31 +32,30 @@ interface BuyOrder {
 }
 /** digifab**/
 async function createConnection() {
-  return await mysql.createConnection({
-    host: process.env.DB_HOST_MYSQL,
-    database: process.env.DB_DATABASE_MYSQL,
-    user: process.env.DB_USER_MYSQL,
-    password: process.env.DB_PASSWORD_MYSQL,
-    port: 3306,
-    ssl: {
-      rejectUnauthorized: true,
-    }
-  });
+    return mysql.createConnection({
+        host: process.env.DB_HOST_MYSQL,
+        database: process.env.DB_DATABASE_MYSQL,
+        user: process.env.DB_USER_MYSQL,
+        password: process.env.DB_PASSWORD_MYSQL,
+        ssl: {
+            rejectUnauthorized: true
+        }
+
+    });
 }
 async function createConnectionWithRetry(): Promise<mysql.Connection> {
 
   while (true) {
 
     try {
-      const connection = await mysql.createConnection({
-        host: process.env.DB_HOST_MYSQL,
-        database: process.env.DB_DATABASE_MYSQL,
-        user: process.env.DB_USER_MYSQL,
-        password: process.env.DB_PASSWORD_MYSQL,
-        port: 3306,
-        ssl: {
-          rejectUnauthorized: true,
-        }
+      const connection = mysql.createConnection({
+          host: process.env.DB_HOST_MYSQL,
+          database: process.env.DB_DATABASE_MYSQL,
+          user: process.env.DB_USER_MYSQL,
+          password: process.env.DB_PASSWORD_MYSQL,
+          ssl: {
+              rejectUnauthorized: true
+          }
       });
 
       console.log('✅ Connected to MySQL');
@@ -74,7 +73,7 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
 }
 export async function getSupplier() {
 
-  const connection = await createConnection();
+  const connection = await createConnectionWithRetry();
 
   let rows: [] = [];
 
@@ -85,6 +84,7 @@ export async function getSupplier() {
       `);
     rows = result as [];
 
+    console.log(rows);
   } catch (error) {
     console.error('❌ Failed to fetch DIGIFAB.FORNECEDOR:', error);
   } finally {

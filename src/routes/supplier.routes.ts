@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getSupplier } from '../dataBase/mysqlClient'
+import { fetchSupplier } from '../controllers/supplier.controller';
 const router = Router();
 
-router.get('/supplier', getSupplier);
+router.get('/supplier', fetchSupplier)
 
 export default router;

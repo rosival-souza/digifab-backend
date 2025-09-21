@@ -11,9 +11,9 @@
     "*.json"
   ],
   "env": {
-    "DB_HOST_MYSQL": "suporters.com",
-    "DB_DATABASE_MYSQL": "suporter_unisinos",
-    "DB_USER_MYSQL": "suporter_unisinos",
-    "DB_PASSWORD_MYSQL": "digifab2025"
+    "DB_HOST_MYSQL": "digifab-engsw-db.mysql.database.azure.com",
+    "DB_DATABASE_MYSQL": "digifab",
+    "DB_USER_MYSQL": "digifab",
+    "DB_PASSWORD_MYSQL": "digifab"
   }
 }

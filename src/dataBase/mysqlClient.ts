@@ -37,10 +37,10 @@ async function createConnection() {
     database: process.env.DB_DATABASE_MYSQL,
     user: process.env.DB_USER_MYSQL,
     password: process.env.DB_PASSWORD_MYSQL,
-    port: 3306,
-    // ssl: {
-    //   rejectUnauthorized: false,
-    // }
+    // port: 3306,
+    ssl: {
+      rejectUnauthorized: true,
+    }
   });
 }
 async function createConnectionWithRetry(): Promise<mysql.Connection> {
@@ -48,15 +48,14 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
   while (true) {
 
     try {
-      const connection = await mysql.createConnection({
-        host: process.env.DB_HOST_MYSQL,
-        database: process.env.DB_DATABASE_MYSQL,
-        user: process.env.DB_USER_MYSQL,
-        password: process.env.DB_PASSWORD_MYSQL,
-        // port: 3306,
-        // ssl: {
-        //   rejectUnauthorized: false,
-        // }
+      const connection = mysql.createConnection({
+          host: process.env.DB_HOST_MYSQL,
+          database: process.env.DB_DATABASE_MYSQL,
+          user: process.env.DB_USER_MYSQL,
+          password: process.env.DB_PASSWORD_MYSQL,
+          // ssl: {
+          //     rejectUnauthorized: true
+          // }
       });
 
       console.log('✅ Connected to MySQL');
@@ -73,7 +72,7 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
 
 }
 export async function getSupplier() {
-  console.log('connecting...', process.env)
+
   const connection = await createConnection();
 
   let rows: [] = [];

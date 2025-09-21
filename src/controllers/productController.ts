@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export const fetchProducts = async (req: Request, res: Response) => {
-    
+    console.log('fetchProducts!!')
     try {
 
         const products = await getAllPrices();

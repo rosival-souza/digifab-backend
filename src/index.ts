@@ -26,6 +26,10 @@ app.use('/api', dashboard);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`👉 Please access this URL to see the products: http://localhost:4000/api/supplier`);
-  console.log('👉 To persist the consumer API data please call the get of this URL: $ curl -X GET http://localhost:4000/api/healths')
+  console.log(`👉 Please access this URL to see the dashboard to daily production by line: http://localhost:${PORT}/api/dashboard/series/daily-production-by-line`);
+  console.log(`👉 Please access this URL to see the dashboard to top products: http://localhost:${PORT}/api/dashboard/rankings/top-products`);
+  console.log(`👉 Please access this URL to see the dashboard to daily mp consumption: http://localhost:${PORT}/api/dashboard/series/daily-mp-consumption`);
+  console.log(`👉 Please access this URL to see the dashboard to mp consumption by type: http://localhost:${PORT}/api/dashboard/aggregates/mp-consumption-by-type`);
+  console.log(`👉 Please access this URL to see the sluppliers: http://localhost:${PORT}/api/supplier`);
+  console.log(`👉 To persist the consumer API data please call the get of this URL: $ curl -X GET http://localhost:${PORT}/api/healths`)
 });

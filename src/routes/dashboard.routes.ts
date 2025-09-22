@@ -1,9 +1,15 @@
-// src/routes/productRoutes.ts
 import { Router } from 'express';
-import { getCryptoProcess } from '../dataBase/mysqlClient'
+import {
+    getDailyMpConsumption,
+    getDailyProductionByLine,
+    getMpConsumptionByType,
+    getTopProducts
+} from "../controllers/dashboard.controller";
 const router = Router();
 
-router.get('/dashboard/production-per-day', getCryptoProcess);
-// router.post('/products', addProducts);
+router.get('/dashboard/series/daily-production-by-line', getDailyProductionByLine);
+router.get('/dashboard/rankings/top-products', getTopProducts);
+router.get('/dashboard/series/daily-mp-consumption', getDailyMpConsumption);
+router.get('/dashboard/aggregates/mp-consumption-by-type', getMpConsumptionByType);
 
 export default router;

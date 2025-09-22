@@ -43,7 +43,7 @@ async function createConnection() {
     }
   });
 }
-async function createConnectionWithRetry(): Promise<mysql.Connection> {
+export async function createConnectionWithRetry(): Promise<mysql.Connection> {
 
   while (true) {
 
@@ -53,9 +53,9 @@ async function createConnectionWithRetry(): Promise<mysql.Connection> {
           database: process.env.DB_DATABASE_MYSQL,
           user: process.env.DB_USER_MYSQL,
           password: process.env.DB_PASSWORD_MYSQL,
-          // ssl: {
-          //     rejectUnauthorized: true
-          // }
+          ssl: {
+               rejectUnauthorized: true
+          }
       });
 
       console.log('✅ Connected to MySQL');

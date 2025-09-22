@@ -36,6 +36,7 @@ app.listen(PORT, () => {
   console.log(`👉 Please access this URL to see the dashboard to top products: http://localhost:${PORT}/api/dashboard/rankings/top-products`);
   console.log(`👉 Please access this URL to see the dashboard to daily mp consumption: http://localhost:${PORT}/api/dashboard/series/daily-mp-consumption`);
   console.log(`👉 Please access this URL to see the dashboard to mp consumption by type: http://localhost:${PORT}/api/dashboard/aggregates/mp-consumption-by-type`);
+  console.log(`👉 Please access this URL to see the dashboard to deviations mp summary: http://localhost:${PORT}/api/dashboard/deviations/mp-summary`);
   console.log(`👉 Please access this URL to see the sluppliers: http://localhost:${PORT}/api/supplier`);
   console.log(`👉 To persist the consumer API data please call the get of this URL: $ curl -X GET http://localhost:${PORT}/api/healths`)
 });

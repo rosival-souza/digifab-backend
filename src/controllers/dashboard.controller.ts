@@ -1,16 +1,22 @@
 import { Request, Response } from 'express';
 import {
     buscarConsumoMpPorDia,
-    buscarConsumoMpPorTipo, buscarLotesProdutoAtendidos, buscarMateriaPrimaConsumida,
+    buscarConsumoMpPorTipo,
+    buscarLotesProdutoAtendidos,
+    buscarMateriaPrimaConsumida,
     buscarOps,
     buscarProducaoPorDiaPorLinha,
     buscarTopProdutos,
-    buscarUnidadesPlanejadas, buscarUtilizacaoMediaLinhas, buscarUtilizacaoMediaSimplesLinhas
+    buscarUnidadesPlanejadas,
+    buscarUtilizacaoMediaLinhas,
+    buscarUtilizacaoMediaSimplesLinhas,
+    buscarPlanejadoVersusConsumido
 } from "../services/dashboardService";
 import {ProducaoDiaLinha} from "../types/ProducaoDiaLinha";
 import {TopProduto} from "../types/TopProduto";
 import {ConsumoMpDia} from "../types/ConsumoMpDia";
 import {ConsumoMpTipo} from "../types/ConsumoMpTipo";
+import {PlanejadoVersusConsumido} from "../types/PlanejadoVersusConsumido";
 
 export const getOrdersCount = async (req: Request, res: Response) => {
     try {
@@ -99,6 +105,15 @@ export const getMpConsumptionByType = async (req: Request, res: Response) => {
         res.json(dados);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch mp consumption by type.' });
+    }
+};
+
+export const getMpSummary = async (req: Request, res: Response) => {
+    try {
+        const dados: PlanejadoVersusConsumido[] = await buscarPlanejadoVersusConsumido();
+        res.json(dados);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch deviations mp summary.' });
     }
 };
 

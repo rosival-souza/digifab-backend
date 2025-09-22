@@ -3,8 +3,9 @@ import {ProducaoDiaLinha} from "../types/ProducaoDiaLinha";
 import {TopProduto} from "../types/TopProduto";
 import {ConsumoMpDia} from "../types/ConsumoMpDia";
 import {ConsumoMpTipo} from "../types/ConsumoMpTipo";
+import {PlanejadoVersusConsumido} from "../types/PlanejadoVersusConsumido";
 
-export async function getOrdersCount(): Promise<number> {
+export async function getOrdersCountQuery(): Promise<number> {
     const connection = await createConnectionWithRetry();
 
     let orders: number = 0;
@@ -30,7 +31,7 @@ export async function getOrdersCount(): Promise<number> {
     return orders;
 }
 
-export async function getPlannedUnits(): Promise<number> {
+export async function getPlannedUnitsQuery(): Promise<number> {
     const connection = await createConnectionWithRetry();
 
     let plannedUnits: number = 0;
@@ -56,7 +57,7 @@ export async function getPlannedUnits(): Promise<number> {
     return plannedUnits;
 }
 
-export async function getRawMpMonsumed(): Promise<number> {
+export async function getRawMpMonsumedQuery(): Promise<number> {
     const connection = await createConnectionWithRetry();
 
     let rawMpConsumed: number = 0;
@@ -81,7 +82,7 @@ export async function getRawMpMonsumed(): Promise<number> {
     return rawMpConsumed;
 }
 
-export async function getServedProductLots(): Promise<number> {
+export async function getServedProductLotsQuery(): Promise<number> {
     const connection = await createConnectionWithRetry();
 
     let servedProductLots: number = 0;
@@ -106,7 +107,7 @@ export async function getServedProductLots(): Promise<number> {
     return servedProductLots;
 }
 
-export async function getLineUtilizationAverage(): Promise<number> {
+export async function getLineUtilizationAverageQuery(): Promise<number> {
     const connection = await createConnectionWithRetry();
 
     let lineUtilizationAverage: number = 0;
@@ -131,7 +132,7 @@ export async function getLineUtilizationAverage(): Promise<number> {
     return lineUtilizationAverage;
 }
 
-export async function getLineUtilizationSimpleAverage(): Promise<number> {
+export async function getLineUtilizationSimpleAverageQuery(): Promise<number> {
     const connection = await createConnectionWithRetry();
 
     let lineUtilizationSimpleAverage: number = 0;
@@ -156,7 +157,7 @@ export async function getLineUtilizationSimpleAverage(): Promise<number> {
     return lineUtilizationSimpleAverage;
 }
 
-export async function getDailyProductionByLine(): Promise<ProducaoDiaLinha[]> {
+export async function getDailyProductionByLineQuery(): Promise<ProducaoDiaLinha[]> {
 
     const connection = await createConnectionWithRetry();
 
@@ -278,6 +279,59 @@ export async function getMpConsumptionByTypeQuery(): Promise<ConsumoMpTipo[]> {
     }
 
     return consumoMpTipoList;
+}
+
+export async function getMpSummaryQuery(): Promise<PlanejadoVersusConsumido[]> {
+
+    const connection = await createConnectionWithRetry();
+
+    let planejadoVersusConsumidoList: PlanejadoVersusConsumido[] = new Array<PlanejadoVersusConsumido>();
+
+    try {
+        const [result] = await connection.execute(
+            `
+                SELECT MP.CODIGO_MP
+                      ,MP.NOME_MP
+                      ,ROUND(SUM(V.PLANEJADO_KG),3) AS PLANEJADO_KG
+                      ,ROUND(SUM(V.CONSUMIDO_KG),3) AS CONSUMIDO_KG
+                      ,ROUND(SUM(V.DESVIO_KG),3)    AS DESVIO_KG
+                  FROM (SELECT MP.ID_MATERIA_PRIMA
+                              ,MP.CODIGO AS CODIGO_MP
+                              ,MP.NOME   AS NOME_MP
+                              ,SUM(MPO.QUANTIDADE_PREVISTA)                    AS PLANEJADO_KG
+                              ,COALESCE(SUM(CONS.CONSUMO_TOTAL),0)             AS CONSUMIDO_KG
+                              ,COALESCE(SUM(CONS.CONSUMO_TOTAL),0) - SUM(MPO.QUANTIDADE_PREVISTA) AS DESVIO_KG
+                          FROM MATERIA_PRIMA_ORDEM_PRODUCAO MPO
+                          JOIN ORDEM_PRODUCAO OP ON OP.ID_ORDEM_PRODUCAO = MPO.ID_ORDEM_PRODUCAO
+                          JOIN MATERIA_PRIMA MP  ON MP.ID_MATERIA_PRIMA  = MPO.ID_MATERIA_PRIMA
+                          LEFT JOIN (SELECT CLM.ID_ORDEM_PRODUCAO
+                                           ,LM.ID_MATERIA_PRIMA
+                                           ,SUM(CLM.QUANTIDADE_CONSUMIDA) AS CONSUMO_TOTAL
+                                       FROM CONSUMO_LOTE_MP CLM
+                                       JOIN LOTE_MP LM ON LM.ID_LOTE_MP = CLM.ID_LOTE_MP
+                                      GROUP BY CLM.ID_ORDEM_PRODUCAO, LM.ID_MATERIA_PRIMA) CONS 
+                                 ON CONS.ID_ORDEM_PRODUCAO = MPO.ID_ORDEM_PRODUCAO
+                                AND CONS.ID_MATERIA_PRIMA  = MPO.ID_MATERIA_PRIMA
+                              WHERE OP.DT_HORA_INICIO >= ?
+                                AND OP.DT_HORA_INICIO <  DATE_ADD(?, INTERVAL 1 DAY)
+                              GROUP BY MP.ID_MATERIA_PRIMA, MP.CODIGO, MP.NOME) V
+                          JOIN (SELECT DISTINCT CODIGO_MP, NOME_MP 
+                                  FROM VW_CONSUMO_MP) MP
+                            ON MP.CODIGO_MP = V.CODIGO_MP
+                 GROUP BY MP.CODIGO_MP
+                         ,MP.NOME_MP
+                 ORDER BY DESVIO_KG DESC`, [obterDataInicial(), obterDataAtual()]);
+        planejadoVersusConsumidoList = result as PlanejadoVersusConsumido[];
+
+        console.log('planejadoVersusConsumidoList: ', planejadoVersusConsumidoList);
+
+    } catch (error) {
+        console.error('❌ Falha ao buscar o desvio de planejado X consumido:', error);
+    } finally {
+        await connection.end();
+    }
+
+    return planejadoVersusConsumidoList;
 }
 
 function obterDataInicial() {

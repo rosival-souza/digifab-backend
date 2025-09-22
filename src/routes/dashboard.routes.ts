@@ -9,7 +9,7 @@ import {
     getRawMpMonsumed,
     getLineUtilizationAverage,
     getLineUtilizationSimpleAverage,
-    getServedProductLots
+    getServedProductLots, getMpSummary
 } from "../controllers/dashboard.controller";
 const router = Router();
 
@@ -22,6 +22,7 @@ router.get('/dashboard/kpis/line-utilization-simple-average', getLineUtilization
 router.get('/dashboard/series/daily-production-by-line', getDailyProductionByLine);
 router.get('/dashboard/rankings/top-products', getTopProducts);
 router.get('/dashboard/series/daily-mp-consumption', getDailyMpConsumption);
+router.get('/dashboard/deviations/mp-summary', getMpSummary);
 router.get('/dashboard/aggregates/mp-consumption-by-type', getMpConsumptionByType);
 
 export default router;

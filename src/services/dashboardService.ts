@@ -1,7 +1,13 @@
 import {ProducaoDiaLinha} from "../types/ProducaoDiaLinha";
 import {
     getDailyMpConsumptionQuery,
-    getDailyProductionByLine, getMpConsumptionByTypeQuery,
+    getDailyProductionByLine,
+    getLineUtilizationAverage,
+    getLineUtilizationSimpleAverage,
+    getMpConsumptionByTypeQuery,
+    getOrdersCount,
+    getPlannedUnits,
+    getRawMpMonsumed, getServedProductLots,
     getTopProductsQuery
 } from "../dataBase/dashboardRepository";
 import {TopProduto} from "../types/TopProduto";
@@ -23,4 +29,28 @@ export async function buscarConsumoMpPorDia(): Promise<ConsumoMpDia[]> {
 
 export async function buscarConsumoMpPorTipo(): Promise<ConsumoMpTipo[]> {
     return await getMpConsumptionByTypeQuery()
+}
+
+export async function buscarOps(): Promise<number> {
+    return await getOrdersCount()
+}
+
+export async function buscarUnidadesPlanejadas(): Promise<number> {
+    return await getPlannedUnits()
+}
+
+export async function buscarMateriaPrimaConsumida(): Promise<number> {
+    return await getRawMpMonsumed()
+}
+
+export async function buscarLotesProdutoAtendidos(): Promise<number> {
+    return await getServedProductLots()
+}
+
+export async function buscarUtilizacaoMediaLinhas(): Promise<number> {
+    return await getLineUtilizationAverage()
+}
+
+export async function buscarUtilizacaoMediaSimplesLinhas(): Promise<number> {
+    return await getLineUtilizationSimpleAverage()
 }

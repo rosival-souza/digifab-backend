@@ -26,6 +26,12 @@ app.use('/api', dashboard);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`👉 Please access this URL to see the dashboard to orders count: http://localhost:${PORT}/api/dashboard/kpis/orders-count`);
+  console.log(`👉 Please access this URL to see the dashboard to planned units: http://localhost:${PORT}/api/dashboard/kpis/planned-units`);
+  console.log(`👉 Please access this URL to see the dashboard to raw mp consumed: http://localhost:${PORT}/api/dashboard/kpis/raw-mp-consumed`);
+  console.log(`👉 Please access this URL to see the dashboard to served product lots: http://localhost:${PORT}/api/dashboard/kpis/served-product-lots`);
+  console.log(`👉 Please access this URL to see the dashboard to line utilization average: http://localhost:${PORT}/api/dashboard/kpis/line-utilization-average`);
+  console.log(`👉 Please access this URL to see the dashboard to line utilization simple average: http://localhost:${PORT}/api/dashboard/kpis/line-utilization-simple-average`);
   console.log(`👉 Please access this URL to see the dashboard to daily production by line: http://localhost:${PORT}/api/dashboard/series/daily-production-by-line`);
   console.log(`👉 Please access this URL to see the dashboard to top products: http://localhost:${PORT}/api/dashboard/rankings/top-products`);
   console.log(`👉 Please access this URL to see the dashboard to daily mp consumption: http://localhost:${PORT}/api/dashboard/series/daily-mp-consumption`);

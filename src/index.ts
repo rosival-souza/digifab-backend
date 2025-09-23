@@ -4,6 +4,7 @@ import supplier from './routes/supplier.routes';
 import healths from './routes/healths.routes';
 import products from './routes/product.routes';
 import dashboard from "./routes/dashboard.routes";
+import productionOrder from "./routes/ordemProducao.routes"
 import cors from 'cors';
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use('/api', healths);
 app.use('/api', products);
 app.use('/api', supplier);
 app.use('/api', dashboard);
+app.use('/api', productionOrder);
 
 
 app.listen(PORT, () => {
@@ -37,6 +39,9 @@ app.listen(PORT, () => {
   console.log(`👉 Please access this URL to see the dashboard to daily mp consumption: http://localhost:${PORT}/api/dashboard/series/daily-mp-consumption`);
   console.log(`👉 Please access this URL to see the dashboard to mp consumption by type: http://localhost:${PORT}/api/dashboard/aggregates/mp-consumption-by-type`);
   console.log(`👉 Please access this URL to see the dashboard to deviations mp summary: http://localhost:${PORT}/api/dashboard/deviations/mp-summary`);
-  console.log(`👉 Please access this URL to see the sluppliers: http://localhost:${PORT}/api/supplier`);
+  console.log(`👉 Please access this URL to see the suppliers: http://localhost:${PORT}/api/supplier`);
+  console.log(`👉 Please access this URL to see the list of production line: http://localhost:${PORT}/api/order-production/production-line`);
+  console.log(`👉 Please access this URL to see the list of order production: http://localhost:${PORT}/api/order-production`);
+  console.log(`👉 Please access this URL to see the detail of order production: http://localhost:${PORT}/api/order-production/:id`);
   console.log(`👉 To persist the consumer API data please call the get of this URL: $ curl -X GET http://localhost:${PORT}/api/healths`)
 });

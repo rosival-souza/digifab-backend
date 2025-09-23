@@ -9,7 +9,8 @@ import {
     getRawMpMonsumed,
     getLineUtilizationAverage,
     getLineUtilizationSimpleAverage,
-    getServedProductLots, getMpSummary
+    getServedProductLots,
+    getMpSummary
 } from "../controllers/dashboard.controller";
 const router = Router();
 

@@ -30,7 +30,7 @@ export const getOrdersCount = async (req: Request, res: Response) => {
 export const getPlannedUnits = async (req: Request, res: Response) => {
     try {
         const dados: number = await buscarUnidadesPlanejadas();
-        res.status(200).json(dados);
+        res.status(200).json({dados});
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch planned units.' });
     }
@@ -39,7 +39,7 @@ export const getPlannedUnits = async (req: Request, res: Response) => {
 export const getRawMpMonsumed = async (req: Request, res: Response) => {
     try {
         const dados: number = await buscarMateriaPrimaConsumida();
-        res.status(200).json(dados);
+        res.status(200).json({dados});
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch raw mp consumed.' });
     }
@@ -48,7 +48,7 @@ export const getRawMpMonsumed = async (req: Request, res: Response) => {
 export const getServedProductLots = async (req: Request, res: Response) => {
     try {
         const dados: number = await buscarLotesProdutoAtendidos();
-        res.status(200).json(dados);
+        res.status(200).json({dados});
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch served product lots.' });
     }
@@ -57,7 +57,7 @@ export const getServedProductLots = async (req: Request, res: Response) => {
 export const getLineUtilizationAverage = async (req: Request, res: Response) => {
     try {
         const dados: number = await buscarUtilizacaoMediaLinhas();
-        res.status(200).json(dados);
+        res.status(200).json({dados});
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch line utilization average.' });
     }
@@ -66,7 +66,7 @@ export const getLineUtilizationAverage = async (req: Request, res: Response) => 
 export const getLineUtilizationSimpleAverage = async (req: Request, res: Response) => {
     try {
         const dados: number = await buscarUtilizacaoMediaSimplesLinhas();
-        res.status(200).json(dados);
+        res.status(200).json({dados});
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch line utilization simple average.' });
     }

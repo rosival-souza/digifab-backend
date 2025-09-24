@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import supplier from './routes/supplier.routes';
 import healths from './routes/healths.routes';
-import products from './routes/product.routes';
 import dashboard from "./routes/dashboard.routes";
 import productionOrder from "./routes/ordemProducao.routes"
 import cors from 'cors';
@@ -20,7 +19,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use('/api', healths);
-app.use('/api', products);
 app.use('/api', supplier);
 app.use('/api', dashboard);
 app.use('/api', productionOrder);

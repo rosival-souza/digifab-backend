@@ -1,16 +1,15 @@
-import {createConnectionWithRetry} from './mysqlClient';
+import {pool} from './mysqlClient';
 import {LinhaProducao} from "../types/LinhaProducao";
 import {OrdemProducaoSimples} from "../types/OrdemProducaoSimples"
 import {OrdemProducaoDetalhado} from "../types/OrdemProducaoDetalhado";
 import {LoteProduto} from "../types/LoteProduto";
 
 export async function getProductionLineQuery(): Promise<LinhaProducao[]> {
-    const connection = await createConnectionWithRetry();
 
     let linhaProducaoList: LinhaProducao[] = [];
 
     try {
-        const [result] = await connection.query(`
+        const [result] = await pool.query(`
             SELECT LP.ID_LINHA_PRODUCAO AS idLinhaProducao
                  , LP.CODIGO            AS codigo
                  , LP.NOME              AS nome
@@ -40,20 +39,16 @@ export async function getProductionLineQuery(): Promise<LinhaProducao[]> {
     } catch (exception) {
         console.error('❌ Falha ao buscar as linhas de produção:', exception);
         throw exception;
-    } finally {
-        await connection.end();
     }
 
     return linhaProducaoList;
 }
 
 export async function getProductLotQuery(): Promise<LoteProduto[]> {
-    const connection = await createConnectionWithRetry();
-
     let loteProdutoList: LoteProduto[] = [];
 
     try {
-        const [result] = await connection.query(`
+        const [result] = await pool.query(`
             SELECT LP.ID_LOTE_PRODUTO AS idLoteProduto
                  , LP.CODIGO          AS codigoLoteProduto
                  , LP.CODIGO_FABRICA  AS codigoFabrica
@@ -87,20 +82,17 @@ export async function getProductLotQuery(): Promise<LoteProduto[]> {
     } catch (exception) {
         console.error('❌ Falha ao buscar a listagem de lotes de produto:', exception);
         throw exception;
-    } finally {
-        await connection.end();
     }
 
     return loteProdutoList;
 }
 
 export async function getProductionOrderListQuery(): Promise<OrdemProducaoSimples[]> {
-    const connection = await createConnectionWithRetry();
 
     let ordemProducaoList: OrdemProducaoSimples[] = [];
 
     try {
-        const [result] = await connection.query(`
+        const [result] = await pool.query(`
             SELECT OP.ID_ORDEM_PRODUCAO   AS idOrdemProducao
                  , OP.CODIGO              AS codigoOrdemProducao
                  , LP.CODIGO              AS codigoLoteProduto
@@ -121,20 +113,17 @@ export async function getProductionOrderListQuery(): Promise<OrdemProducaoSimple
     } catch (exception) {
         console.error('❌ Falha ao buscar a listagem de ordens de produção:', exception);
         throw exception;
-    } finally {
-        await connection.end();
     }
 
     return ordemProducaoList;
 }
 
 export async function getProductionOrderDetailQuery(id: number): Promise<OrdemProducaoDetalhado | null> {
-    const connection = await createConnectionWithRetry();
 
     let ordemProducao: OrdemProducaoDetalhado;
 
     try {
-        const [result] = await connection.query(`
+        const [result] = await pool.query(`
             SELECT OP.ID_ORDEM_PRODUCAO      AS idOrdemProducao
                  , OP.CODIGO                 AS codigoOrdemProducao
                  , LP.ID_LOTE_PRODUTO        AS idLoteProduto
@@ -216,8 +205,6 @@ export async function getProductionOrderDetailQuery(id: number): Promise<OrdemPr
     } catch (exception) {
         console.error('❌ Falha ao buscar os detalhes da ordem de produção:', exception);
         throw exception;
-    } finally {
-        await connection.end();
     }
 
     // @ts-ignore
@@ -230,12 +217,11 @@ export async function createProductionOrderQuery(codigo: string,
                                                  idResponsavel: string,
                                                  quantidadeProduzir: string,
                                                  dataHoraInicio: string): Promise<number> {
-    const connection = await createConnectionWithRetry()
 
     let idOrdemProducao: number = 0
 
     try {
-        const [result] = await connection.execute(`
+        const [result] = await pool.execute(`
                     INSERT INTO ORDEM_PRODUCAO
                     ( CODIGO
                     , ID_LOTE_PRODUTO
@@ -259,7 +245,7 @@ export async function createProductionOrderQuery(codigo: string,
         // @ts-ignore
         idOrdemProducao = parseInt(result.insertId);
 
-        await connection.execute(`
+        await pool.execute(`
                     INSERT INTO MATERIA_PRIMA_ORDEM_PRODUCAO
                     ( ID_ORDEM_PRODUCAO
                     , ID_MATERIA_PRIMA
@@ -282,8 +268,6 @@ export async function createProductionOrderQuery(codigo: string,
     } catch (exception) {
         console.error('❌ Falha ao criar a ordem de produção:', exception);
         throw exception;
-    } finally {
-        await connection.end();
     }
 
     return idOrdemProducao;

@@ -1,4 +1,4 @@
-import { createConnectionWithRetry } from './mysqlClient';
+import { pool } from './mysqlClient';
 import {ProducaoDiaLinha} from "../types/ProducaoDiaLinha";
 import {TopProduto} from "../types/TopProduto";
 import {ConsumoMpDia} from "../types/ConsumoMpDia";
@@ -6,12 +6,10 @@ import {ConsumoMpTipo} from "../types/ConsumoMpTipo";
 import {PlanejadoVersusConsumido} from "../types/PlanejadoVersusConsumido";
 
 export async function getOrdersCountQuery(): Promise<number> {
-    const connection = await createConnectionWithRetry();
-
     let orders: number = 0;
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT COUNT(*) AS QTD_OPS
                   FROM ORDEM_PRODUCAO
@@ -24,20 +22,16 @@ export async function getOrdersCountQuery(): Promise<number> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar a quantidade de OP\'s:', error);
-    } finally {
-        await connection.end();
     }
 
     return orders;
 }
 
 export async function getPlannedUnitsQuery(): Promise<number> {
-    const connection = await createConnectionWithRetry();
-
     let plannedUnits: number = 0;
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT COALESCE(SUM(QUANTIDADE_PRODUZIR),0) AS UNIDADES_PLANEJADAS
                   FROM ORDEM_PRODUCAO
@@ -50,20 +44,17 @@ export async function getPlannedUnitsQuery(): Promise<number> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar as unidades planejadas no período:', error);
-    } finally {
-        await connection.end();
     }
 
     return plannedUnits;
 }
 
 export async function getRawMpMonsumedQuery(): Promise<number> {
-    const connection = await createConnectionWithRetry();
 
     let rawMpConsumed: number = 0;
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT ROUND(COALESCE(SUM(CONSUMO_KG),0),3) AS MP_CONSUMIDA_KG
                   FROM VW_CONSUMO_MP_POR_DIA
@@ -75,20 +66,16 @@ export async function getRawMpMonsumedQuery(): Promise<number> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar as quantidade de matéria-prima consumida (kg) no período:', error);
-    } finally {
-        await connection.end();
     }
 
     return rawMpConsumed;
 }
 
 export async function getServedProductLotsQuery(): Promise<number> {
-    const connection = await createConnectionWithRetry();
-
     let servedProductLots: number = 0;
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT COUNT(DISTINCT ID_LOTE_PRODUTO) AS LOTES_PRODUTO_ATENDIDOS
                   FROM VW_OP_BASICA
@@ -100,20 +87,16 @@ export async function getServedProductLotsQuery(): Promise<number> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar a quantidade de lotes de produto atendidos:', error);
-    } finally {
-        await connection.end();
     }
 
     return servedProductLots;
 }
 
 export async function getLineUtilizationAverageQuery(): Promise<number> {
-    const connection = await createConnectionWithRetry();
-
     let lineUtilizationAverage: number = 0;
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT ROUND(COALESCE(SUM(PROGRAMADO_DIA),0) / NULLIF(COALESCE(SUM(CAPACIDADE_ESTIMADA),0),0), 2) AS UTILIZACAO_MEDIA_PONDERADA
                   FROM VW_UTILIZACAO_LINHA_DIA
@@ -125,20 +108,16 @@ export async function getLineUtilizationAverageQuery(): Promise<number> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar as utilização média (ponderada) das linhas no período:', error);
-    } finally {
-        await connection.end();
     }
 
     return lineUtilizationAverage;
 }
 
 export async function getLineUtilizationSimpleAverageQuery(): Promise<number> {
-    const connection = await createConnectionWithRetry();
-
     let lineUtilizationSimpleAverage: number = 0;
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT ROUND(AVG(UTILIZACAO_REL), 2) AS UTILIZACAO_MEDIA_SIMPLES
                   FROM VW_UTILIZACAO_LINHA_DIA
@@ -150,21 +129,16 @@ export async function getLineUtilizationSimpleAverageQuery(): Promise<number> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar as utilização média simples das linhas no período:', error);
-    } finally {
-        await connection.end();
     }
 
     return lineUtilizationSimpleAverage;
 }
 
 export async function getDailyProductionByLineQuery(): Promise<ProducaoDiaLinha[]> {
-
-    const connection = await createConnectionWithRetry();
-
     let producaoDiaLinhaList: ProducaoDiaLinha[] = new Array<ProducaoDiaLinha>();
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                  SELECT DIA
                        ,CODIGO_LINHA
@@ -180,21 +154,16 @@ export async function getDailyProductionByLineQuery(): Promise<ProducaoDiaLinha[
 
     } catch (error) {
         console.error('❌ Falha ao buscar Produção por Dia por Linha:', error);
-    } finally {
-        await connection.end();
     }
 
     return producaoDiaLinhaList;
 }
 
 export async function getTopProductsQuery(): Promise<TopProduto[]> {
-
-    const connection = await createConnectionWithRetry();
-
     let topProdutoList: TopProduto[] = new Array<TopProduto>();
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT B.CODIGO_PRODUTO
                       ,B.NOME_PRODUTO
@@ -211,21 +180,16 @@ export async function getTopProductsQuery(): Promise<TopProduto[]> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar os Top Produtos:', error);
-    } finally {
-        await connection.end();
     }
 
     return topProdutoList;
 }
 
 export async function getDailyMpConsumptionQuery(): Promise<ConsumoMpDia[]> {
-
-    const connection = await createConnectionWithRetry();
-
     let consumoMpDiaList: ConsumoMpDia[] = new Array<ConsumoMpDia>();
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT DIA
                       ,CODIGO_MP
@@ -241,21 +205,16 @@ export async function getDailyMpConsumptionQuery(): Promise<ConsumoMpDia[]> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar o Consumo MP por dia:', error);
-    } finally {
-        await connection.end();
     }
 
     return consumoMpDiaList;
 }
 
 export async function getMpConsumptionByTypeQuery(): Promise<ConsumoMpTipo[]> {
-
-    const connection = await createConnectionWithRetry();
-
     let consumoMpTipoList: ConsumoMpTipo[] = new Array<ConsumoMpTipo>();
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT MP.CODIGO_MP
                       ,MP.NOME_MP
@@ -274,21 +233,16 @@ export async function getMpConsumptionByTypeQuery(): Promise<ConsumoMpTipo[]> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar o Consumo MP por dia:', error);
-    } finally {
-        await connection.end();
     }
 
     return consumoMpTipoList;
 }
 
 export async function getMpSummaryQuery(): Promise<PlanejadoVersusConsumido[]> {
-
-    const connection = await createConnectionWithRetry();
-
     let planejadoVersusConsumidoList: PlanejadoVersusConsumido[] = new Array<PlanejadoVersusConsumido>();
 
     try {
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             `
                 SELECT MP.CODIGO_MP
                       ,MP.NOME_MP
@@ -327,8 +281,6 @@ export async function getMpSummaryQuery(): Promise<PlanejadoVersusConsumido[]> {
 
     } catch (error) {
         console.error('❌ Falha ao buscar o desvio de planejado X consumido:', error);
-    } finally {
-        await connection.end();
     }
 
     return planejadoVersusConsumidoList;

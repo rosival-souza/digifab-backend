@@ -5,6 +5,9 @@ import {ConsumoMpDia} from "../types/ConsumoMpDia";
 import {ConsumoMpTipo} from "../types/ConsumoMpTipo";
 import {PlanejadoVersusConsumido} from "../types/PlanejadoVersusConsumido";
 
+
+
+
 export async function getOrdersCountQuery(): Promise<number> {
     let orders: number = 0;
 
@@ -19,6 +22,7 @@ export async function getOrdersCountQuery(): Promise<number> {
         orders = result[0].QTD_OPS as number;
 
         console.log('orders: ', orders);
+        return orders
 
     } catch (error) {
         console.error('❌ Falha ao buscar a quantidade de OP\'s:', error);
@@ -185,6 +189,21 @@ export async function getTopProductsQuery(): Promise<TopProduto[]> {
     return topProdutoList;
 }
 
+export async function getUsers() {
+    let result: any
+    try {
+
+         [result] = await pool.execute('SELECT * FROM digifab.usuario')
+
+        console.log('Users: ', result);
+
+    } catch (error) {
+        console.error('❌ Falha ao buscar os Top Produtos:', error);
+    }
+
+    return result;
+}
+
 export async function getDailyMpConsumptionQuery(): Promise<ConsumoMpDia[]> {
     let consumoMpDiaList: ConsumoMpDia[] = new Array<ConsumoMpDia>();
 
@@ -288,7 +307,7 @@ export async function getMpSummaryQuery(): Promise<PlanejadoVersusConsumido[]> {
 
 function obterDataInicial() {
     const d = new Date();
-    d.setDate(d.getDate() - 13);
+    d.setDate(d.getDate() - 30);
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');

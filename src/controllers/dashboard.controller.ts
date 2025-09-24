@@ -21,7 +21,7 @@ import {PlanejadoVersusConsumido} from "../types/PlanejadoVersusConsumido";
 export const getOrdersCount = async (req: Request, res: Response) => {
     try {
         const dados: number = await buscarOps();
-        res.status(200).json(dados);
+        res.status(200).json([{dados}]);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch orders count.' });
     }
@@ -78,6 +78,15 @@ export const getDailyProductionByLine = async (req: Request, res: Response) => {
         res.status(200).json(dados);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch daily production by line.' });
+    }
+};
+
+export const getUsers = async (req: Request, res: Response) => {
+    try {
+        const dados: TopProduto[] = await buscarTopProdutos();
+        res.status(200).json(dados);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch top products.' });
     }
 };
 

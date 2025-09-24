@@ -10,7 +10,7 @@ export const fetchSupplier = async (req: Request, res: Response) => {
         
         // console.log('data ->', data)
 
-        res.json(data);
+        res.status(200).json(data);
 
     } catch (error) {
 

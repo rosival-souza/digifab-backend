@@ -1,15 +1,22 @@
 import { Request, Response } from 'express';
 
 import {
+    buscarDetalhesApontamentoDeConsumo, buscarItensConsumidos,
     buscarLinhasProducao,
     buscarLotesProduto,
     buscarOrdemProducao,
-    buscarOrdensProducao, criarOrdemProducao
+    buscarOrdensProducao,
+    buscarSaldoPorLoteMpPorOp,
+    criarOrdemProducao
 } from "../services/ordemProducaoService";
 import {LinhaProducao} from "../types/LinhaProducao";
 import {OrdemProducaoSimples} from "../types/OrdemProducaoSimples";
 import {OrdemProducaoDetalhado} from "../types/OrdemProducaoDetalhado";
 import {LoteProduto} from "../types/LoteProduto";
+import {MateriaPrima} from "../types/MateriaPrima";
+import {SaldoPorLoteMp} from "../types/SaldoPorLoteMp";
+import {ConsumoDetalhe} from "../types/ConsumoDetalhe";
+import {ConsumoItem} from "../types/ConsumoItem";
 
 
 export const getProductionLine = async (req: Request, res: Response) => {
@@ -88,3 +95,39 @@ export const createProductionOrder = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Failed to fetch orders production detail.' });
     }
 }
+
+export const getBalancesByRmLotByOpList = async (req: Request, res: Response) => {
+    let id = req.params.id;
+    try {
+        const dados: SaldoPorLoteMp[] = await buscarSaldoPorLoteMpPorOp(parseInt(id))
+        res.status(200).json(dados)
+    } catch (exception) {
+        res.status(500).json({ message: 'Failed to fetch the list of balances by lot of raw material.' });
+    }
+}
+
+export const getConsumptionPointingDetail = async (req: Request, res: Response) => {
+    let id = req.params.id;
+    try {
+        const dados: ConsumoDetalhe | null = await buscarDetalhesApontamentoDeConsumo(parseInt(id))
+        if (dados === null) {
+            res.status(404).json({})
+        } else {
+            res.status(200).json(dados)
+        }
+    } catch (exception) {
+        res.status(500).json({ message: 'Failed to fetch the consumption pointing detail.' });
+    }
+}
+export const getConsumptionItemList = async (req: Request, res: Response) => {
+    let id = req.params.id;
+    try {
+        const dados: ConsumoItem[] = await buscarItensConsumidos(parseInt(id))
+        res.status(200).json(dados)
+    } catch (exception) {
+        res.status(500).json({ message: 'Failed to fetch the list of consumption items.' });
+    }
+}
+
+
+

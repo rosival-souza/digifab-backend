@@ -3,6 +3,10 @@ import {LinhaProducao} from "../types/LinhaProducao";
 import {OrdemProducaoSimples} from "../types/OrdemProducaoSimples"
 import {OrdemProducaoDetalhado} from "../types/OrdemProducaoDetalhado";
 import {LoteProduto} from "../types/LoteProduto";
+import {MateriaPrima} from "../types/MateriaPrima";
+import {SaldoPorLoteMp} from "../types/SaldoPorLoteMp";
+import {ConsumoDetalhe} from "../types/ConsumoDetalhe";
+import {ConsumoItem} from "../types/ConsumoItem";
 
 export async function getProductionLineQuery(): Promise<LinhaProducao[]> {
 
@@ -107,7 +111,7 @@ export async function getProductionOrderListQuery(): Promise<OrdemProducaoSimple
                           ON P.ID_PRODUTO = LP.ID_PRODUTO
                      JOIN LINHA_PRODUCAO LINPROD
                           ON LINPROD.ID_LINHA_PRODUCAO = OP.ID_LINHA_PRODUCAO
-           ORDER BY OP.CODIGO`)
+            ORDER BY OP.CODIGO`)
         ordemProducaoList = result as OrdemProducaoSimples[];
 
     } catch (exception) {
@@ -207,7 +211,6 @@ export async function getProductionOrderDetailQuery(id: number): Promise<OrdemPr
         throw exception;
     }
 
-    // @ts-ignore
     return ordemProducao;
 }
 
@@ -271,4 +274,144 @@ export async function createProductionOrderQuery(codigo: string,
     }
 
     return idOrdemProducao;
+}
+
+export async function getBalancesByRmLotByOpListQuery(idOrdemProducao: number): Promise<SaldoPorLoteMp[]> {
+    let saldoPorLoteMpList: SaldoPorLoteMp[] = [];
+
+    try {
+        const [result] = await pool.query(`
+            SELECT MPOP.ID_MATERIA_PRIMA
+            FROM MATERIA_PRIMA_ORDEM_PRODUCAO MPOP
+            WHERE MPOP.ID_ORDEM_PRODUCAO = ?`, [idOrdemProducao])
+
+        if (!Array.isArray(result) || !result.length) {
+            return saldoPorLoteMpList;
+        }
+
+        // @ts-ignore
+        const idMateriaPrima: number = result[0].ID_MATERIA_PRIMA
+
+        console.log(idMateriaPrima)
+
+        const [result1] = await pool.query(`
+            SELECT LM.ID_LOTE_MP                                    AS idLoteMp,
+                   LM.CODIGO                                        AS codigoMp,
+                   ROUND(LM.QUANTIDADE - COALESCE(C.CONSUMO, 0), 3) AS saldoKg
+            FROM LOTE_MP LM
+                     LEFT JOIN (SELECT ID_LOTE_MP
+                                     , SUM(QUANTIDADE_CONSUMIDA) CONSUMO
+                                FROM CONSUMO_LOTE_MP
+                                GROUP BY ID_LOTE_MP) C
+                               ON C.ID_LOTE_MP = LM.ID_LOTE_MP
+            WHERE LM.ID_MATERIA_PRIMA = ?
+            ORDER BY LM.DATA_RECEBIMENTO`, [idMateriaPrima]);
+
+        // @ts-ignore
+        saldoPorLoteMpList = result1.map((row: any) => ({
+            idLoteMp: row.idLoteMp,
+            codigoMp: row.codigoMp,
+            saldoKg: row.saldoKg
+        })) satisfies SaldoPorLoteMp[]
+
+        console.log(saldoPorLoteMpList)
+    } catch (exception) {
+        console.error('❌ Falha ao buscar a lista de saldos por lote de matéria-prima:', exception);
+        throw exception;
+    }
+
+    return saldoPorLoteMpList;
+}
+
+export async function getConsumptionPointingDetailQuery(idOrdemProducao: number): Promise<ConsumoDetalhe | null> {
+    let conumoDetalhe: ConsumoDetalhe;
+
+    try {
+        const [result] = await pool.query(`
+            SELECT OP.ID_ORDEM_PRODUCAO                        AS idOrdemProducao
+                 , OP.CODIGO                                   AS codigoOrdemProducao
+                 , LP.CODIGO                                   AS codigoLinhaProducao
+                 , MP.CODIGO                                   AS codigoMateriaPrima
+                 , MPOP.QUANTIDADE_PREVISTA                    AS planejado
+                 , COALESCE(SUM(CLMP.QUANTIDADE_CONSUMIDA), 0) AS consumido
+            FROM ORDEM_PRODUCAO OP
+                     JOIN LINHA_PRODUCAO LP
+                          ON LP.ID_LINHA_PRODUCAO = OP.ID_LINHA_PRODUCAO
+                     JOIN MATERIA_PRIMA_ORDEM_PRODUCAO MPOP
+                          ON MPOP.ID_ORDEM_PRODUCAO = OP.ID_ORDEM_PRODUCAO
+                     JOIN MATERIA_PRIMA MP
+                          ON MP.ID_MATERIA_PRIMA = MPOP.ID_MATERIA_PRIMA
+                     LEFT JOIN CONSUMO_LOTE_MP CLMP
+                               ON CLMP.ID_ORDEM_PRODUCAO = OP.ID_ORDEM_PRODUCAO
+            WHERE OP.ID_ORDEM_PRODUCAO = ?
+            GROUP BY OP.ID_ORDEM_PRODUCAO
+                   , OP.CODIGO
+                   , LP.CODIGO
+                   , MP.CODIGO
+                   , MPOP.QUANTIDADE_PREVISTA`, [idOrdemProducao])
+
+        if (!Array.isArray(result) || !result.length) {
+            return null;
+        }
+
+        const row: any = result[0];
+
+        conumoDetalhe = {
+            idOrdemProducao: row.idOrdemProducao,
+            codigoOrdemProducao: row.codigoOrdemProducao,
+            codigoLinhaProducao: row.codigoLinhaProducao,
+            codigoMateriaPrima: row.codigoMateriaPrima,
+            planejado: row.planejado,
+            consumido: row.consumido
+        } satisfies ConsumoDetalhe;
+
+    } catch (exception) {
+        console.error('❌ Falha ao buscar os detalhes do apontamento de consumo:', exception);
+        throw exception;
+    }
+
+    return conumoDetalhe;
+}
+
+export async function getConsumptionItemListQuery(idOrdemProducao: number): Promise<ConsumoItem[]> {
+    let consumoItemList: ConsumoItem[] = [];
+
+    try {
+        const [result] = await pool.query(`
+            SELECT CLMP.ID_ORDEM_PRODUCAO    AS idOrdemProducao
+                 , CLMP.ID_CONSUMO_LOTE_MP   AS idConsumoLoteMp
+                 , MP.CODIGO                 AS codigoMateriaPrima
+                 , LMP.CODIGO                AS codigoLoteMp
+                 , CLMP.QUANTIDADE_CONSUMIDA AS quantidade
+                 , CLMP.DATA_CONSUMO         AS dataConsumo
+            FROM CONSUMO_LOTE_MP CLMP
+                     JOIN LOTE_MP LMP
+                          ON LMP.ID_LOTE_MP = CLMP.ID_LOTE_MP
+                     JOIN MATERIA_PRIMA MP
+                          ON MP.ID_MATERIA_PRIMA = LMP.ID_MATERIA_PRIMA
+                     JOIN FORNECEDOR F
+                          ON F.ID_FORNECEDOR = LMP.ID_FORNECEDOR
+                     JOIN USUARIO U
+                          ON U.ID_USUARIO = LMP.ID_RESPONSAVEL
+            WHERE CLMP.ID_ORDEM_PRODUCAO = ?
+            ORDER BY CLMP.ID_ORDEM_PRODUCAO`, [idOrdemProducao])
+
+        // @ts-ignore
+        consumoItemList = result.map((row: any) => ({
+            idOrdemProducao: row.idOrdemProducao,
+            idConsumoLoteMp: row.idConsumoLoteMp,
+            codigoMateriaPrima: row.codigoMateriaPrima,
+            codigoLoteMp: row.codigoLoteMp,
+            quantidade: row.quantidade,
+            dataConsumo: row.dataConsumo
+        })) satisfies ConsumoItem[]
+
+        console.log(consumoItemList)
+
+    } catch (exception) {
+        console.error('❌ Falha ao buscar os itens consumidos:', exception);
+        throw exception;
+    }
+
+    return consumoItemList;
 }

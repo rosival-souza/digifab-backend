@@ -41,5 +41,8 @@ app.listen(PORT, () => {
   console.log(`👉 Please access this URL to see the list of order production: http://localhost:${PORT}/api/order-production`);
   console.log(`👉 Please access this URL to create order production: http://localhost:${PORT}/api/order-production/create`);
   console.log(`👉 Please access this URL to see the detail of order production: http://localhost:${PORT}/api/order-production/:id`);
+  console.log(`👉 Please access this URL to see the list of balances by lot of raw material by order production: http://localhost:${PORT}/api/order-production/:id/balances-by-lot-mp`);
+  console.log(`👉 Please access this URL to see the consumption pointing detail: http://localhost:${PORT}/api/order-production/:id/consumption-pointing-detail`);
+  console.log(`👉 Please access this URL to see the list of consumption items: http://localhost:${PORT}/api/order-production/:id/consumption-items`);
   console.log(`👉 To persist the consumer API data please call the get of this URL: $ curl -X GET http://localhost:${PORT}/api/healths`)
 });

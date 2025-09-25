@@ -1,6 +1,7 @@
 import {LinhaProducao} from "../types/LinhaProducao";
 import {
     createProductionOrderQuery,
+    getBalancesByRmLotByOpListQuery, getConsumptionItemListQuery, getConsumptionPointingDetailQuery,
     getProductionLineQuery,
     getProductionOrderDetailQuery,
     getProductionOrderListQuery,
@@ -9,6 +10,10 @@ import {
 import {OrdemProducaoSimples} from "../types/OrdemProducaoSimples";
 import {OrdemProducaoDetalhado} from "../types/OrdemProducaoDetalhado";
 import {LoteProduto} from "../types/LoteProduto";
+import {MateriaPrima} from "../types/MateriaPrima";
+import {SaldoPorLoteMp} from "../types/SaldoPorLoteMp";
+import {ConsumoDetalhe} from "../types/ConsumoDetalhe";
+import {ConsumoItem} from "../types/ConsumoItem";
 
 export async function buscarLinhasProducao(): Promise<LinhaProducao[]>  {
     return getProductionLineQuery();
@@ -38,4 +43,16 @@ export async function criarOrdemProducao(codigo:string,
         idResponsavel,
         quantidadeProduzir,
         dataHoraInicio);
+}
+
+export async function buscarSaldoPorLoteMpPorOp(idOrdemProducao: number): Promise<SaldoPorLoteMp[]> {
+    return getBalancesByRmLotByOpListQuery(idOrdemProducao);
+}
+
+export async function buscarDetalhesApontamentoDeConsumo(idOrdemProducao: number): Promise<ConsumoDetalhe | null> {
+    return getConsumptionPointingDetailQuery(idOrdemProducao);
+}
+
+export async function buscarItensConsumidos(idOrdemProducao: number): Promise<ConsumoItem[]> {
+    return getConsumptionItemListQuery(idOrdemProducao);
 }

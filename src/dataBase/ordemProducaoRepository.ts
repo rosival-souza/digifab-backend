@@ -415,3 +415,42 @@ export async function getConsumptionItemListQuery(idOrdemProducao: number): Prom
 
     return consumoItemList;
 }
+
+export async function createConsumptionItemQuery(idOrdemProducao: number, idLoteMp: number, quantidade: number) {
+    try {
+        const [result] = await pool.query(`
+            SELECT (LM.QUANTIDADE - COALESCE(C.CONSUMO, 0)) >= ? AS OK
+            FROM LOTE_MP LM
+                     LEFT JOIN (SELECT ID_LOTE_MP
+                                     , SUM(QUANTIDADE_CONSUMIDA) CONSUMO
+                                FROM CONSUMO_LOTE_MP
+                                GROUP BY ID_LOTE_MP) C
+                               ON C.ID_LOTE_MP = LM.ID_LOTE_MP
+            WHERE LM.ID_LOTE_MP = ?`, [quantidade, idLoteMp])
+
+        console.log(result)
+
+        if (!Array.isArray(result) || !result.length) {
+            throw new Error("Lote de matéria-prima não localizado! Verifique.");
+        }
+
+        // @ts-ignore
+        if (result[0].OK === 0) {
+            throw new Error("Não há estoque para o consumo! Verifique.");
+        }
+
+        await pool.query(`
+            INSERT INTO CONSUMO_LOTE_MP
+            ( ID_ORDEM_PRODUCAO
+            , ID_LOTE_MP
+            , QUANTIDADE_CONSUMIDA
+            , DATA_CONSUMO)
+            VALUES ( ?
+                   , ?
+                   , ?
+                   , NOW())`, [idOrdemProducao, idLoteMp, quantidade])
+    } catch (exception) {
+        console.error('❌ Falha ao criar item consumido:', exception);
+        throw exception;
+    }
+}

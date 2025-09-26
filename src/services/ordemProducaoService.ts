@@ -1,5 +1,6 @@
 import {LinhaProducao} from "../types/LinhaProducao";
 import {
+    createConsumptionItemQuery,
     createProductionOrderQuery,
     getBalancesByRmLotByOpListQuery, getConsumptionItemListQuery, getConsumptionPointingDetailQuery,
     getProductionLineQuery,
@@ -55,4 +56,8 @@ export async function buscarDetalhesApontamentoDeConsumo(idOrdemProducao: number
 
 export async function buscarItensConsumidos(idOrdemProducao: number): Promise<ConsumoItem[]> {
     return getConsumptionItemListQuery(idOrdemProducao);
+}
+
+export async function criarItemConsumido(idOrdemProducao: number, idLoteMp: number, quantidade: number) {
+    await createConsumptionItemQuery(idOrdemProducao, idLoteMp, quantidade);
 }

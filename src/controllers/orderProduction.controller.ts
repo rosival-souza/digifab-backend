@@ -6,14 +6,13 @@ import {
     buscarLotesProduto,
     buscarOrdemProducao,
     buscarOrdensProducao,
-    buscarSaldoPorLoteMpPorOp,
+    buscarSaldoPorLoteMpPorOp, criarItemConsumido,
     criarOrdemProducao
 } from "../services/ordemProducaoService";
 import {LinhaProducao} from "../types/LinhaProducao";
 import {OrdemProducaoSimples} from "../types/OrdemProducaoSimples";
 import {OrdemProducaoDetalhado} from "../types/OrdemProducaoDetalhado";
 import {LoteProduto} from "../types/LoteProduto";
-import {MateriaPrima} from "../types/MateriaPrima";
 import {SaldoPorLoteMp} from "../types/SaldoPorLoteMp";
 import {ConsumoDetalhe} from "../types/ConsumoDetalhe";
 import {ConsumoItem} from "../types/ConsumoItem";
@@ -79,7 +78,7 @@ export const createProductionOrder = async (req: Request, res: Response) => {
             !idResponsavel ||
             !quantidadeProduzir ||
             !dataHoraInicio) {
-            res.status(422).json({
+            res.status(400).json({
                 message: 'Arguments is required',
             })
         } else {
@@ -119,6 +118,7 @@ export const getConsumptionPointingDetail = async (req: Request, res: Response) 
         res.status(500).json({ message: 'Failed to fetch the consumption pointing detail.' });
     }
 }
+
 export const getConsumptionItemList = async (req: Request, res: Response) => {
     let id = req.params.id;
     try {
@@ -126,6 +126,36 @@ export const getConsumptionItemList = async (req: Request, res: Response) => {
         res.status(200).json(dados)
     } catch (exception) {
         res.status(500).json({ message: 'Failed to fetch the list of consumption items.' });
+    }
+}
+
+export const createConsumptionItem = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const {
+        idLoteMp,
+        quantidade
+    } = req.body;
+    try {
+        if (!id ||
+            !idLoteMp ||
+            !quantidade) {
+            res.status(400).json({
+                message: 'Arguments is required',
+            })
+        } else {
+            await criarItemConsumido(parseInt(id), idLoteMp, quantidade)
+            res.status(201).json({})
+        }
+    } catch (exception) {
+        // @ts-ignore
+        if (exception.message === "Lote de matéria-prima não localizado! Verifique.") {
+            res.status(404).json({ message: 'Raw material lot not exists. Verify it.' });
+        } // @ts-ignore
+        else if (exception.message === "Não há estoque para o consumo! Verifique."){
+            res.status(422).json({ message: 'There is no stock for consumption! Verify it.' });
+        } else {
+            res.status(500).json({message: 'Failed to create consumption item.'});
+        }
     }
 }
 

@@ -1,7 +1,10 @@
 import {Router} from "express";
 import {
+    createConsumptionItem,
     createProductionOrder,
-    getBalancesByRmLotByOpList, getConsumptionItemList, getConsumptionPointingDetail,
+    getBalancesByRmLotByOpList,
+    getConsumptionItemList,
+    getConsumptionPointingDetail,
     getProductionLine,
     getProductionOrderDetail,
     getProductionOrderList,
@@ -17,5 +20,6 @@ router.get("/order-production/:id", getProductionOrderDetail)
 router.get("/order-production/:id/balances-by-lot-mp", getBalancesByRmLotByOpList)
 router.get("/order-production/:id/consumption-pointing-detail", getConsumptionPointingDetail)
 router.get("/order-production/:id/consumption-items", getConsumptionItemList)
+router.post("/order-production/:id/consumption-item", createConsumptionItem)
 
 export default router;

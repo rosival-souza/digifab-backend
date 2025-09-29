@@ -1,33 +1,73 @@
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+// src/auth/util/auth.ts
+import { Request, Response, NextFunction } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-dotenv.config();
+// Tipar o payload que você usa na app
+export interface AuthUser {
+    sub: string;
+    email?: string;
+    roles?: string[];
+    [k: string]: unknown;
+}
 
-export function authRequired(req: { headers: { authorization: string; }; user: jwt.Jwt & jwt.JwtPayload & void; }, res: {
-    status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): any; new(): any; }; };
-}, next: () => void) {
-    const auth = req.headers.authorization || '';
-    const parts = auth.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-        return res.status(401).json({ error: 'Missing or invalid Authorization header' });
-    }
-    try {
-        // @ts-ignore
-        const payload = jwt.verify(parts[1], process.env.JWT_SECRET);
-        req.user = payload;
-        next();
-    } catch (e) {
-        return res.status(401).json({ error: 'Invalid token' });
+// Estender o Request p/ receber user
+declare module 'express-serve-static-core' {
+    interface Request {
+        user?: AuthUser;
     }
 }
 
-export function roleRequired(...roles: any[]) {
-    return (req: { user: { role: any; }; }, res: {
-        status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): any; new(): any; }; };
-    }, next: () => void) => {
-        if (!req.user || !roles.includes(req.user.role)) {
-            return res.status(403).json({ error: 'Forbidden' });
+// Tipar a env (evita undefined nas libs TS)
+declare global {
+    namespace NodeJS {
+        interface ProcessEnv {
+            JWT_SECRET?: string; // continua opcional em tempo de build; validamos em runtime
         }
-        next();
+    }
+}
+
+export function authRequired(req: Request, res: Response, next: NextFunction) {
+    const auth = req.headers.authorization;
+    if (!auth?.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Token ausente' });
+    }
+
+    const token = auth.split(' ')[1];
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        // Falta de configuração do servidor
+        console.error('JWT_SECRET não configurado');
+        return res.status(500).json({ error: 'Configuração do servidor ausente' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, secret) as JwtPayload | string;
+
+        // Se o token foi assinado com string subject
+        if (typeof decoded === 'string') {
+            req.user = { sub: decoded };
+        } else {
+            // Mapear para seu modelo (ajuste conforme seu token)
+            req.user = {
+                sub: String(decoded.sub ?? ''),
+                email: (decoded as any).email,
+                roles: (decoded as any).roles ?? [],
+                ...decoded,
+            };
+        }
+
+        return next();
+    } catch {
+        return res.status(401).json({ error: 'Token inválido ou expirado' });
+    }
+}
+
+// Middleware de autorização por papel
+export function roleRequired(...roles: string[]) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const userRoles = req.user?.roles ?? [];
+        const autorizado = roles.length === 0 || roles.some(r => userRoles.includes(r));
+        if (!autorizado) return res.status(403).json({ error: 'Acesso negado' });
+        return next();
     };
 }

@@ -1,6 +1,5 @@
 import express from 'express';
 import dotenv from 'dotenv';
-// import auth from './auth/route/auth.routes'
 import auth from './auth/controller/auth.controller'
 import healths from './routes/healths.routes';
 import dashboard from "./routes/dashboard.routes";

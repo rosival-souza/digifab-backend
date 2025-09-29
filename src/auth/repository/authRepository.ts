@@ -65,7 +65,7 @@ export async function updateUser(id: number, email: string | undefined, nome: st
             SET EMAIL    = ?
               , NOME     = ?
               , URL_FOTO = ?
-            WHERE ID = ?`, [email, nome, urlFoto, id])
+            WHERE ID_USUARIO = ?`, [email, nome, urlFoto, id])
     } catch (exception) {
         console.log('Erro ao atualizar o usuário: ', exception);
         throw exception;

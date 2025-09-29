@@ -14,6 +14,8 @@
     "DB_HOST_MYSQL": "digifab-engsw-db.mysql.database.azure.com",
     "DB_DATABASE_MYSQL": "digifab",
     "DB_USER_MYSQL": "digifab",
-    "DB_PASSWORD_MYSQL": "digifab"
+    "DB_PASSWORD_MYSQL": "digifab",
+    "JWT_SECRET": "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",
+    "GOOGLE_CLIENT_ID": "999996956231-8i7k5dl9pjoqq1namq32cur92v0vhci6.apps.googleusercontent.com"
   }
 }

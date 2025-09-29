@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+// import auth from './auth/route/auth.routes'
+import auth from './auth/controller/auth.controller'
 import healths from './routes/healths.routes';
 import dashboard from "./routes/dashboard.routes";
 import productionOrder from "./routes/ordemProducao.routes"
@@ -20,6 +22,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use('/auth', auth)
 app.use('/api', healths);
 app.use('/api', dashboard);
 app.use('/api', productionOrder);

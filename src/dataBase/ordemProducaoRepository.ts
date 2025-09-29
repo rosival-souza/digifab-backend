@@ -193,13 +193,13 @@ export async function getProductionOrderDetailQuery(id: number): Promise<OrdemPr
                 descricao: row.descricao,
                 status: row.status,
                 responsavel: {
-                    id: String(row.idUsuario),
+                    idUsuario: String(row.idUsuario),
                     nomeUsuario: row.nomeUsuario,
                     email: row.email,
                 },
             },
             usuario: {
-                id: String(row.idUsuario),
+                idUsuario: String(row.idUsuario),
                 nomeUsuario: row.nomeUsuario,
                 email: row.email,
             },

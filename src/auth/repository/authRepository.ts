@@ -56,7 +56,7 @@ export async function createUser(sub: string, email: string | undefined, nome: s
     return idUsuario;
 }
 
-export async function updateUser(id: number, email: string | undefined, nome: string, urlFoto: string) {
+export async function updateUser(id: string, email: string | undefined, nome: string, urlFoto: string) {
     let idUsuario: number;
 
     try {

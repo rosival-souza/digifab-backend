@@ -16,6 +16,7 @@ import {LoteProduto} from "../types/LoteProduto";
 import {SaldoPorLoteMp} from "../types/SaldoPorLoteMp";
 import {ConsumoDetalhe} from "../types/ConsumoDetalhe";
 import {ConsumoItem} from "../types/ConsumoItem";
+import {getUserId} from "../auth/util/auth";
 
 
 export const getProductionLine = async (req: Request, res: Response) => {
@@ -66,12 +67,20 @@ export const createProductionOrder = async (req: Request, res: Response) => {
         codigo,
         idLoteProduto,
         idLinhaProducao,
-        idResponsavel,
         quantidadeProduzir,
         dataHoraInicio
     } = req.body;
 
     try {
+
+        const idResponsavel = getUserId(req)
+
+        console.log(idResponsavel)
+
+        if (!idResponsavel) {
+            return res.status(403).json({"erro": "Usuário não autenticado!"})
+        }
+
         if (!codigo ||
             !idLoteProduto ||
             !idLinhaProducao ||
@@ -82,13 +91,15 @@ export const createProductionOrder = async (req: Request, res: Response) => {
                 message: 'Arguments is required',
             })
         } else {
-            let idOrdemProducao = criarOrdemProducao(codigo,
+            let idOrdemProducao = await criarOrdemProducao(codigo,
                 idLoteProduto,
                 idLinhaProducao,
-                idResponsavel,
+                idResponsavel.toString(),
                 quantidadeProduzir,
                 dataHoraInicio)
-            res.status(201).json({}).location('api/order-production/' + idOrdemProducao)
+
+            res.location('/api/order-production/' + idOrdemProducao)
+            res.status(201).json({})
         }
     } catch (exception) {
         res.status(500).json({ message: 'Failed to fetch orders production detail.' });

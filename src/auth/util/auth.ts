@@ -62,12 +62,7 @@ export function authRequired(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-// Middleware de autorização por papel
-export function roleRequired(...roles: string[]) {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const userRoles = req.user?.roles ?? [];
-        const autorizado = roles.length === 0 || roles.some(r => userRoles.includes(r));
-        if (!autorizado) return res.status(403).json({ error: 'Acesso negado' });
-        return next();
-    };
+export function getUserId(req: Request) {
+    console.log(req);
+    return req.user?.uid ?? null;
 }

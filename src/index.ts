@@ -30,6 +30,7 @@ app.use('/api', trackability);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`👉 Please access this URL to realize login: http://localhost:${PORT}/auth/google`);
     console.log(`👉 Please access this URL to see the dashboard to orders count: http://localhost:${PORT}/api/dashboard/kpis/orders-count`);
     console.log(`👉 Please access this URL to see the dashboard to planned units: http://localhost:${PORT}/api/dashboard/kpis/planned-units`);
     console.log(`👉 Please access this URL to see the dashboard to raw mp consumed: http://localhost:${PORT}/api/dashboard/kpis/raw-mp-consumed`);
@@ -41,7 +42,6 @@ app.listen(PORT, () => {
     console.log(`👉 Please access this URL to see the dashboard to daily mp consumption: http://localhost:${PORT}/api/dashboard/series/daily-mp-consumption`);
     console.log(`👉 Please access this URL to see the dashboard to mp consumption by type: http://localhost:${PORT}/api/dashboard/aggregates/mp-consumption-by-type`);
     console.log(`👉 Please access this URL to see the dashboard to deviations mp summary: http://localhost:${PORT}/api/dashboard/deviations/mp-summary`);
-    console.log(`👉 Please access this URL to see the suppliers: http://localhost:${PORT}/api/supplier`);
     console.log(`👉 Please access this URL to see the list of production line: http://localhost:${PORT}/api/order-production/production-line`);
     console.log(`👉 Please access this URL to see the list of product lot: http://localhost:${PORT}/api/order-production/product-lot`);
     console.log(`👉 Please access this URL to see the list of order production: http://localhost:${PORT}/api/order-production`);

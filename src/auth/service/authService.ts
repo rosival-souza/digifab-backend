@@ -36,6 +36,7 @@ export async function loginGoogle(idToken: any): Promise<any> {
         if (!usuario) {
             userId = await createUser(sub, email, name, picture)
         } else {
+            userId = usuario.idUsuario
             await updateUser(userId, email, name, picture)
         }
 

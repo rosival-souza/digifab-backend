@@ -3,7 +3,6 @@ import {LinhaProducao} from "../types/LinhaProducao";
 import {OrdemProducaoSimples} from "../types/OrdemProducaoSimples"
 import {OrdemProducaoDetalhado} from "../types/OrdemProducaoDetalhado";
 import {LoteProduto} from "../types/LoteProduto";
-import {MateriaPrima} from "../types/MateriaPrima";
 import {SaldoPorLoteMp} from "../types/SaldoPorLoteMp";
 import {ConsumoDetalhe} from "../types/ConsumoDetalhe";
 import {ConsumoItem} from "../types/ConsumoItem";

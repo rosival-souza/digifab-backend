@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import healths from './routes/healths.routes';
 import dashboard from "./routes/dashboard.routes";
 import productionOrder from "./routes/ordemProducao.routes"
+import trackability from "./routes/rastreabilidade.route"
+
 import cors from 'cors';
 
 dotenv.config();
@@ -21,6 +23,7 @@ app.use(express.json());
 app.use('/api', healths);
 app.use('/api', dashboard);
 app.use('/api', productionOrder);
+app.use('/api', trackability);
 
 
 app.listen(PORT, () => {
@@ -46,5 +49,6 @@ app.listen(PORT, () => {
     console.log(`👉 Please access this URL to see the consumption pointing detail: http://localhost:${PORT}/api/order-production/:id/consumption-pointing-detail`);
     console.log(`👉 Please access this URL to see the list of consumption items: http://localhost:${PORT}/api/order-production/:id/consumption-items`);
     console.log(`👉 Please access this URL to create a consumption item: http://localhost:${PORT}/api/order-production/:id/consumption-item`);
+    console.log(`👉 Please access this URL to see the list of trackability: http://localhost:${PORT}/api/trackability?codigoLoteProduto=`);
     console.log(`👉 To persist the consumer API data please call the get of this URL: $ curl -X GET http://localhost:${PORT}/api/healths`)
 });

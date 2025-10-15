@@ -26,7 +26,7 @@ export async function getProductionLineQuery(): Promise<LinhaProducao[]> {
                      JOIN USUARIO U ON LP.ID_RESPONSAVEL = U.ID_USUARIO`)
         // @ts-ignore
         linhaProducaoList = result.map((row: any) => ({
-            idOrdemProducao: row.idOrdemProducao,
+            idLinhaProducao: row.idLinhaProducao,
             codigo: row.codigo,
             nome: row.nome,
             capacidadeHora: row.capacidadeHora,
@@ -38,7 +38,7 @@ export async function getProductionLineQuery(): Promise<LinhaProducao[]> {
                 email: row.email
             }
         })) satisfies LinhaProducao[]
-
+        console.log("linhaProducaoList: ", linhaProducaoList)
     } catch (exception) {
         console.error('❌ Falha ao buscar as linhas de produção:', exception);
         throw exception;
